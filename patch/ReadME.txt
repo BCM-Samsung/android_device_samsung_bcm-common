@@ -1,1 +1,0 @@
-Diff patch for CyanogenMOD source
