@@ -38,12 +38,26 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ramdisk/fstab.hawaii_ss_loganxx:root/fstab.hawaii_ss_loganxx \
     $(LOCAL_PATH)/ramdisk/init.rc:root/init.rc \
-    $(LOCAL_PATH)/ramdisk/init.hawaii_ss_loganxx.rc:root/init.hawaii_ss_$(TARGET_DEVICE).rc \
     $(LOCAL_PATH)/ramdisk/init.bcm2166x.usb.rc:root/init.bcm2166x.usb.rc \
     $(LOCAL_PATH)/ramdisk/init.log.rc:root/init.log.rc \
     $(LOCAL_PATH)/ramdisk/lpm.rc:root/lpm.rc \
-    $(LOCAL_PATH)/ramdisk/charger:root/charger \
-    $(LOCAL_PATH)/ramdisk/ueventd.hawaii_ss_loganxx.rc:root/ueventd.hawaii_ss_$(TARGET_DEVICE).rc
+    $(LOCAL_PATH)/ramdisk/charger:root/charger
+
+ifeq ($(TARGET_DEVICE),logan)
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/ramdisk/init.hawaii_ss_loganxx.rc:root/init.hawaii_ss_logan.rc \
+    $(LOCAL_PATH)/ramdisk/ueventd.hawaii_ss_loganxx.rc:root/ueventd.hawaii_ss_logan.rc
+
+endif
+
+ifeq ($(TARGET_DEVICE),logands)
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/ramdisk/init.hawaii_ss_loganxx.rc:root/init.hawaii_ss_logands.rc \
+    $(LOCAL_PATH)/ramdisk/ueventd.hawaii_ss_loganxx.rc:root/ueventd.hawaii_ss_logands.rc
+
+endif
 
 # Prebuilt kl keymaps
 PRODUCT_COPY_FILES += \
