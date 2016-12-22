@@ -1,6 +1,61 @@
-diff -ur CM11_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h CM11_loganxxP/frameworks/av/include/media/stagefright/ColorConverter.h
---- CM11_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-19 12:52:14.000000000 +0000
-+++ CM11_loganxxP/frameworks/av/include/media/stagefright/ColorConverter.h	2016-01-08 01:53:32.000000000 +0000
+diff -ur a/external/bluetooth/bluedroid/audio_a2dp_hw/audio_a2dp_hw.c b/external/bluetooth/bluedroid/audio_a2dp_hw/audio_a2dp_hw.c
+--- a/external/bluetooth/bluedroid/audio_a2dp_hw/audio_a2dp_hw.c	2016-02-06 00:00:00.000000000 +0000
++++ b/external/bluetooth/bluedroid/audio_a2dp_hw/audio_a2dp_hw.c	2016-02-06 00:00:00.000000000 +0000
+@@ -775,9 +775,7 @@
+     /* dump params */
+     str_parms_dump(parms);
+ 
+-    retval = str_parms_get_str(parms, "closing", keyval, sizeof(keyval));
+-
+-    if (retval >= 0)
++    if (str_parms_get_str(parms, "closing", keyval, sizeof(keyval)) >= 0)
+     {
+         if (strcmp(keyval, "true") == 0)
+         {
+@@ -788,9 +786,7 @@
+         }
+     }
+ 
+-    retval = str_parms_get_str(parms, "A2dpSuspended", keyval, sizeof(keyval));
+-
+-    if (retval >= 0)
++    if (str_parms_get_str(parms, "closing", keyval, sizeof(keyval)) >= 0)
+     {
+         pthread_mutex_lock(&out->lock);
+         if (strcmp(keyval, "true") == 0)
+diff -ur a/external/tinyalsa/include/tinyalsa/asoundlib.h b/external/tinyalsa/include/tinyalsa/asoundlib.h
+--- a/external/tinyalsa/include/tinyalsa/asoundlib.h	2016-05-25 10:17:32.620000000 +0000
++++ b/external/tinyalsa/include/tinyalsa/asoundlib.h	2016-05-25 10:17:43.408000000 +0000
+@@ -204,6 +204,7 @@
+ 
+ /* Start and stop a PCM channel that doesn't transfer data */
+ int pcm_start(struct pcm *pcm);
++int pcm_drain(struct pcm *pcm);
+ int pcm_stop(struct pcm *pcm);
+ 
+ /* ioctl function for PCM driver */
+diff -ur a/external/tinyalsa/pcm.c b/external/tinyalsa/pcm.c
+--- a/external/tinyalsa/pcm.c	2016-05-25 10:17:32.620000000 +0000
++++ b/external/tinyalsa/pcm.c	2016-05-25 10:17:43.412000000 +0000
+@@ -788,6 +788,14 @@
+     return 0;
+ }
+ 
++int pcm_drain(struct pcm *pcm)
++{
++    if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_DRAIN) < 0)
++        return oops(pcm, errno, "drain failed");
++
++    return 0;
++}
++
+ int pcm_stop(struct pcm *pcm)
+ {
+     if (ioctl(pcm->fd, SNDRV_PCM_IOCTL_DROP) < 0)
+
+diff -ur a/frameworks/av/include/media/stagefright/ColorConverter.h b/frameworks/av/include/media/stagefright/ColorConverter.h
+--- a/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-19 12:52:14.000000000 +0000
++++ b/frameworks/av/include/media/stagefright/ColorConverter.h	2016-01-08 01:53:32.000000000 +0000
 @@ -78,6 +78,9 @@
  
      status_t convertCbYCrY(
@@ -11,9 +66,9 @@ diff -ur CM11_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h C
  
      status_t convertYUV420Planar(
              const BitmapParams &src, const BitmapParams &dst);
-diff -ur CM11_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM11_loganxxP/frameworks/av/media/libstagefright/ACodec.cpp
---- CM11_loganxx/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-19 12:52:14.000000000 +0000
-+++ CM11_loganxxP/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-22 18:33:05.000000000 +0000
+diff -ur a/frameworks/av/media/libstagefright/ACodec.cpp b/frameworks/av/media/libstagefright/ACodec.cpp
+--- a/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-19 12:52:14.000000000 +0000
++++ b/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-22 18:33:05.000000000 +0000
 @@ -496,11 +496,11 @@
  
      status_t err;
@@ -159,9 +214,9 @@ diff -ur CM11_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM11_loganxx
          if (def.nBufferSize < X) {
              def.nBufferSize = X;
          }
-diff -ur CM11_loganxx/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp CM11_loganxxP/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp
---- CM11_loganxx/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-19 12:52:14.000000000 +0000
-+++ CM11_loganxxP/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-22 18:40:01.000000000 +0000
+diff -ur a/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp b/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp
+--- a/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-19 12:52:14.000000000 +0000
++++ b/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-22 18:40:01.000000000 +0000
 @@ -55,6 +55,7 @@
      switch (mSrcFormat) {
          case OMX_COLOR_FormatYUV420Planar:
@@ -253,9 +308,9 @@ diff -ur CM11_loganxx/frameworks/av/media/libstagefright/colorconversion/ColorCo
              signed v_g = -v * 208;
              signed v_r = v * 409;
  
-diff -ur CM11_loganxx/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp CM11_loganxxP/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
---- CM11_loganxx/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp	2016-02-19 12:52:14.000000000 +0000
-+++ CM11_loganxxP/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp	2016-02-22 18:41:23.000000000 +0000
+diff -ur a/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp b/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp
+--- a/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp	2016-02-19 12:52:14.000000000 +0000
++++ b/frameworks/av/media/libstagefright/colorconversion/SoftwareRenderer.cpp	2016-02-22 18:41:23.000000000 +0000
 @@ -208,8 +208,8 @@
          }
  
@@ -267,9 +322,9 @@ diff -ur CM11_loganxx/frameworks/av/media/libstagefright/colorconversion/Softwar
  
              src_u += mWidth / 2;
              src_v += mWidth / 2;
-diff -ur CM11_loganxx/frameworks/av/media/libstagefright/OMXCodec.cpp CM11_loganxxP/frameworks/av/media/libstagefright/OMXCodec.cpp
---- CM11_loganxx/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-19 12:52:14.000000000 +0000
-+++ CM11_loganxxP/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-22 18:38:54.000000000 +0000
+diff -ur a/frameworks/av/media/libstagefright/OMXCodec.cpp b/frameworks/av/media/libstagefright/OMXCodec.cpp
+--- a/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-19 12:52:14.000000000 +0000
++++ b/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-22 18:38:54.000000000 +0000
 @@ -1799,6 +1799,19 @@
          CHECK_EQ(err, (status_t)OK);
          CHECK_EQ((int)format.eCompressionFormat, (int)OMX_VIDEO_CodingUnused);
@@ -387,9 +442,9 @@ diff -ur CM11_loganxx/frameworks/av/media/libstagefright/OMXCodec.cpp CM11_logan
      if (!isEncoder && !strncmp(mime, "video/", 6)) {
          if (omx->storeMetaDataInBuffers(
                      node, 1 /* port index */, OMX_TRUE) == OK ||
-diff -ur CM11_loganxx/frameworks/base/services/java/com/android/server/power/PowerManagerService.java CM11_loganxxP/frameworks/base/services/java/com/android/server/power/PowerManagerService.java
---- CM11_loganxx/frameworks/base/services/java/com/android/server/power/PowerManagerService.java	2016-02-19 12:52:22.000000000 +0000
-+++ CM11_loganxxP/frameworks/base/services/java/com/android/server/power/PowerManagerService.java	2016-02-22 18:45:44.000000000 +0000
+diff -ur a/frameworks/base/services/java/com/android/server/power/PowerManagerService.java b/frameworks/base/services/java/com/android/server/power/PowerManagerService.java
+--- a/frameworks/base/services/java/com/android/server/power/PowerManagerService.java	2016-02-19 12:52:22.000000000 +0000
++++ b/frameworks/base/services/java/com/android/server/power/PowerManagerService.java	2016-02-22 18:45:44.000000000 +0000
 @@ -247,6 +247,7 @@
      // Timestamp of the last call to user activity.
      private long mLastUserActivityTime;
@@ -449,9 +504,9 @@ diff -ur CM11_loganxx/frameworks/base/services/java/com/android/server/power/Pow
              Thread.currentThread().interrupt();
          }
      }
-diff -ur CM11_loganxx/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java CM11_loganxxP/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java
---- CM11_loganxx/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java	2016-02-19 12:52:22.000000000 +0000
-+++ CM11_loganxxP/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java	2016-02-22 18:47:57.000000000 +0000
+diff -ur a/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java b/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java
+--- a/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java	2016-02-19 12:52:22.000000000 +0000
++++ b/frameworks/base/telephony/java/android/telephony/MSimTelephonyManager.java	2016-02-22 18:47:57.000000000 +0000
 @@ -957,35 +957,11 @@
       * @hide
       */
@@ -511,9 +566,9 @@ diff -ur CM11_loganxx/frameworks/base/telephony/java/android/telephony/MSimTelep
      }
  
      /**
-diff -ur CM11_loganxx/frameworks/native/libs/gui/SensorEventQueue.cpp CM11_loganxxP/frameworks/native/libs/gui/SensorEventQueue.cpp
---- CM11_loganxx/frameworks/native/libs/gui/SensorEventQueue.cpp	2016-02-19 12:52:24.000000000 +0000
-+++ CM11_loganxxP/frameworks/native/libs/gui/SensorEventQueue.cpp	2016-02-22 18:49:17.000000000 +0000
+diff -ur a/frameworks/native/libs/gui/SensorEventQueue.cpp b/frameworks/native/libs/gui/SensorEventQueue.cpp
+--- a/frameworks/native/libs/gui/SensorEventQueue.cpp	2016-02-19 12:52:24.000000000 +0000
++++ b/frameworks/native/libs/gui/SensorEventQueue.cpp	2016-02-22 18:49:17.000000000 +0000
 @@ -128,8 +128,12 @@
  
  status_t SensorEventQueue::enableSensor(int32_t handle, int32_t samplingPeriodUs,
@@ -528,9 +583,9 @@ diff -ur CM11_loganxx/frameworks/native/libs/gui/SensorEventQueue.cpp CM11_logan
  }
  
  status_t SensorEventQueue::flush() const {
-diff -ur CM11_loganxx/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp CM11_loganxxP/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp
---- CM11_loganxx/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp	2016-02-19 12:52:24.000000000 +0000
-+++ CM11_loganxxP/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp	2016-01-08 01:53:32.000000000 +0000
+diff -ur a/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp b/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp
+--- a/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp	2016-02-19 12:52:24.000000000 +0000
++++ b/frameworks/native/services/surfaceflinger/DisplayHardware/HWComposer.cpp	2016-01-08 01:53:32.000000000 +0000
 @@ -1234,13 +1234,18 @@
          //getLayer()->compositionType = HWC_FRAMEBUFFER;
      }
@@ -550,9 +605,9 @@ diff -ur CM11_loganxx/frameworks/native/services/surfaceflinger/DisplayHardware/
      }
      virtual void setDefaultState() {
          hwc_layer_1_t* const l = getLayer();
-diff -ur CM11_loganxx/frameworks/native/services/surfaceflinger/Layer.cpp CM11_loganxxP/frameworks/native/services/surfaceflinger/Layer.cpp
---- CM11_loganxx/frameworks/native/services/surfaceflinger/Layer.cpp	2016-02-19 12:52:24.000000000 +0000
-+++ CM11_loganxxP/frameworks/native/services/surfaceflinger/Layer.cpp	2016-02-22 18:50:11.000000000 +0000
+diff -ur a/frameworks/native/services/surfaceflinger/Layer.cpp b/frameworks/native/services/surfaceflinger/Layer.cpp
+--- a/frameworks/native/services/surfaceflinger/Layer.cpp	2016-02-19 12:52:24.000000000 +0000
++++ b/frameworks/native/services/surfaceflinger/Layer.cpp	2016-02-22 18:50:11.000000000 +0000
 @@ -1260,6 +1260,8 @@
  
  void Layer::updateTransformHint(const sp<const DisplayDevice>& hw) {
@@ -570,9 +625,9 @@ diff -ur CM11_loganxx/frameworks/native/services/surfaceflinger/Layer.cpp CM11_l
      mSurfaceFlingerConsumer->setTransformHint(orientation);
      mTransformHint = orientation;
  }
-diff -ur CM11_loganxx/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp CM11_loganxxP/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
---- CM11_loganxx/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp	2016-02-19 12:52:24.000000000 +0000
-+++ CM11_loganxxP/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp	2016-02-22 18:51:21.000000000 +0000
+diff -ur a/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp b/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp
+--- a/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp	2016-02-19 12:52:24.000000000 +0000
++++ b/frameworks/native/services/surfaceflinger/SurfaceFlinger.cpp	2016-02-22 18:51:21.000000000 +0000
 @@ -1162,6 +1162,7 @@
              sp<const DisplayDevice> hw(mDisplays[dpy]);
              const int32_t id = hw->getHwcDisplayId();
@@ -617,9 +672,9 @@ diff -ur CM11_loganxx/frameworks/native/services/surfaceflinger/SurfaceFlinger.c
      // get screen geometry
      const uint32_t hw_w = hw->getWidth();
      const uint32_t hw_h = hw->getHeight();
-diff -ur CM11_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java CM11_loganxxP/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java
---- CM11_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java	2016-02-22 18:54:50.000000000 +0000
+diff -ur a/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java b/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java
+--- a/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony/src/java/com/android/internal/telephony/ExtCallManager.java	2016-02-22 18:54:50.000000000 +0000
 @@ -334,6 +334,16 @@
              case RINGING:
                  if (VDBG) Rlog.d(LOG_TAG, "setAudioMode RINGING");
@@ -637,9 +692,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony/src/java/com/android/internal/tel
                  if (curAudioMode != AudioManager.MODE_RINGTONE) {
                      // only request audio focus if the ringtone is going to be heard
                      if (mAudioManager.getStreamVolume(AudioManager.STREAM_RING) > 0
-diff -ur CM11_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java CM11_loganxxP/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java
---- CM11_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-22 18:55:14.000000000 +0000
+diff -ur a/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java b/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java
+--- a/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-22 18:55:14.000000000 +0000
 @@ -150,6 +150,7 @@
      boolean mDnsCheckDisabled;
      public DcTrackerBase mDcTracker;
@@ -687,9 +742,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony/src/java/com/android/internal/tel
          pw.println(" mCallRingContinueToken=" + mCallRingContinueToken);
          pw.println(" mCallRingDelay=" + mCallRingDelay);
          pw.println(" mIsTheCurrentActivePhone=" + mIsTheCurrentActivePhone);
-diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java
---- CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java	2016-02-22 18:56:41.000000000 +0000
+diff -ur a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java
+--- a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/CardSubscriptionManager.java	2016-02-22 18:56:41.000000000 +0000
 @@ -143,11 +143,13 @@
  
  
@@ -843,9 +898,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeauror
              mAllCardsInfoAvailable = true;
              notifyAllCardsInfoAvailable();
          }
-diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java
---- CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java	2016-02-22 18:57:12.000000000 +0000
+diff -ur a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java
+--- a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimCDMALTEPhone.java	2016-02-22 18:57:12.000000000 +0000
 @@ -99,7 +99,6 @@
                  this, EVENT_SUBSCRIPTION_ACTIVATED, null);
          subMgr.registerForSubscriptionDeactivated(mSubscription,
@@ -854,9 +909,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeauror
      }
  
      @Override
-diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java
---- CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java	2016-02-22 18:57:23.000000000 +0000
+diff -ur a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java
+--- a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimGSMPhone.java	2016-02-22 18:57:23.000000000 +0000
 @@ -85,7 +85,6 @@
                  this, EVENT_SUBSCRIPTION_ACTIVATED, null);
          subMgr.registerForSubscriptionDeactivated(mSubscription,
@@ -865,9 +920,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeauror
  
          setProperties();
      }
-diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java
---- CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java	2016-02-22 18:57:35.000000000 +0000
+diff -ur a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java
+--- a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/MSimUiccController.java	2016-02-22 18:57:35.000000000 +0000
 @@ -157,7 +157,6 @@
              Integer index = new Integer(i);
              mCis[i].registerForIccStatusChanged(this, EVENT_ICC_STATUS_CHANGED, index);
@@ -876,9 +931,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeauror
              mCis[i].registerForOn(this, EVENT_ICC_STATUS_CHANGED, index);
              mCis[i].registerForNotAvailable(this, EVENT_RADIO_UNAVAILABLE, index);
          }
-diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java
---- CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java	2016-02-19 12:52:25.000000000 +0000
-+++ CM11_loganxxP/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java	2016-02-22 18:58:15.000000000 +0000
+diff -ur a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java
+--- a/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java	2016-02-19 12:52:25.000000000 +0000
++++ b/frameworks/opt/telephony-msim/frameworks/src/com/codeaurora/telephony/msim/SubscriptionManager.java	2016-02-22 18:58:15.000000000 +0000
 @@ -164,6 +164,7 @@
  
      private boolean[] mCardInfoAvailable = new boolean[mNumPhones];
@@ -1005,9 +1060,9 @@ diff -ur CM11_loganxx/frameworks/opt/telephony-msim/frameworks/src/com/codeauror
  
      private boolean isAllCardsInfoAvailable() {
          boolean result = true;
-diff -ur CM11_loganxx/hardware/broadcom/libbt/src/userial_vendor.c CM11_loganxxP/hardware/broadcom/libbt/src/userial_vendor.c
---- CM11_loganxx/hardware/broadcom/libbt/src/userial_vendor.c	2016-02-19 12:52:26.000000000 +0000
-+++ CM11_loganxxP/hardware/broadcom/libbt/src/userial_vendor.c	2016-02-22 18:59:05.000000000 +0000
+diff -ur a/hardware/broadcom/libbt/src/userial_vendor.c b/hardware/broadcom/libbt/src/userial_vendor.c
+--- a/hardware/broadcom/libbt/src/userial_vendor.c	2016-02-19 12:52:26.000000000 +0000
++++ b/hardware/broadcom/libbt/src/userial_vendor.c	2016-02-22 18:59:05.000000000 +0000
 @@ -182,6 +182,10 @@
      uint8_t data_bits;
      uint16_t parity;
@@ -1032,9 +1087,9 @@ diff -ur CM11_loganxx/hardware/broadcom/libbt/src/userial_vendor.c CM11_loganxxP
      userial_ioctl_init_bt_wake(vnd_userial.fd);
  #endif
  
-diff -ur CM11_loganxx/packages/apps/Settings/res/xml/multi_sim_settings.xml CM11_loganxxP/packages/apps/Settings/res/xml/multi_sim_settings.xml
---- CM11_loganxx/packages/apps/Settings/res/xml/multi_sim_settings.xml	2016-02-19 12:52:42.000000000 +0000
-+++ CM11_loganxxP/packages/apps/Settings/res/xml/multi_sim_settings.xml	2016-02-22 19:00:24.000000000 +0000
+diff -ur a/packages/apps/Settings/res/xml/multi_sim_settings.xml b/packages/apps/Settings/res/xml/multi_sim_settings.xml
+--- a/packages/apps/Settings/res/xml/multi_sim_settings.xml	2016-02-19 12:52:42.000000000 +0000
++++ b/packages/apps/Settings/res/xml/multi_sim_settings.xml	2016-02-22 19:00:24.000000000 +0000
 @@ -31,16 +31,6 @@
  <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
          xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
@@ -1052,9 +1107,9 @@ diff -ur CM11_loganxx/packages/apps/Settings/res/xml/multi_sim_settings.xml CM11
      <CheckBoxPreference
          android:key="tune_away"
          android:title="@string/tune_away_title"
-diff -ur CM11_loganxx/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java CM11_loganxxP/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java
---- CM11_loganxx/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java	2016-02-19 12:52:42.000000000 +0000
-+++ CM11_loganxxP/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java	2016-02-22 19:01:44.000000000 +0000
+diff -ur a/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java b/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java
+--- a/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java	2016-02-19 12:52:42.000000000 +0000
++++ b/packages/apps/Settings/src/com/android/settings/MultiSimSettings.java	2016-02-22 19:01:44.000000000 +0000
 @@ -101,7 +101,6 @@
      private ListPreference mVoice;
      private ListPreference mData;
@@ -1099,9 +1154,9 @@ diff -ur CM11_loganxx/packages/apps/Settings/src/com/android/settings/MultiSimSe
  
                  case EVENT_SET_VOICE_SUBSCRIPTION:
                      if (!mHasTuneAway) {
-diff -ur CM11_loganxx/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java CM11_loganxxP/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java
---- CM11_loganxx/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java	2016-02-19 12:52:45.000000000 +0000
-+++ CM11_loganxxP/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java	2016-02-22 19:03:14.000000000 +0000
+diff -ur a/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java b/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java
+--- a/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java	2016-02-19 12:52:45.000000000 +0000
++++ b/packages/services/Telephony/src/com/android/phone/CallFeaturesSetting.java	2016-02-22 19:03:14.000000000 +0000
 @@ -60,6 +60,7 @@
  import android.provider.ContactsContract.CommonDataKinds;
  import android.provider.MediaStore;
