@@ -43,22 +43,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ramdisk/lpm.rc:root/lpm.rc \
     $(LOCAL_PATH)/ramdisk/charger:root/charger
 
-ifeq ($(TARGET_DEVICE),logan)
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/ramdisk/init.hawaii_ss_loganxx.rc:root/init.hawaii_ss_logan.rc \
-    $(LOCAL_PATH)/ramdisk/ueventd.hawaii_ss_loganxx.rc:root/ueventd.hawaii_ss_logan.rc
-
-endif
-
-ifeq ($(TARGET_DEVICE),logands)
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/ramdisk/init.hawaii_ss_loganxx.rc:root/init.hawaii_ss_logands.rc \
-    $(LOCAL_PATH)/ramdisk/ueventd.hawaii_ss_loganxx.rc:root/ueventd.hawaii_ss_logands.rc
-
-endif
-
 # Prebuilt kl keymaps
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayouts/bcm_headset.kl:system/usr/keylayout/bcm_headset.kl \
@@ -108,7 +92,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Insecure ADBD
 ADDITIONAL_DEFAULT_PROPERTIES += \
     ro.adb.secure=0 \
-    persist.service.adb.enable=1
+    persist.service.adb.enable=0
 
 # Usb accessory
 PRODUCT_PACKAGES += \
