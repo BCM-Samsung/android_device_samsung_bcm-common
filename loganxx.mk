@@ -106,7 +106,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     mobiledata.interfaces=rmnet0 \
     ro.telephony.ril_class=SamsungBCMRIL \
     ro.zygote.disable_gl_preload=true \
-    persist.radio.multisim.config=dsds \
     cm.updater.uri=http://updates.cm-ota.pp.ua \
     ro.telephony.call_ring.multiple=0 \
     ro.telephony.call_ring=0
