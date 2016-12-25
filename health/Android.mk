@@ -1,5 +1,3 @@
-LOCAL_PATH := $(call my-dir)
-
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := healthd-hawaii.cpp
 LOCAL_MODULE := libhealthd-loganxx.hawaii
