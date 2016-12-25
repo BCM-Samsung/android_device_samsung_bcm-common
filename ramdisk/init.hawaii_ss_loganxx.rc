@@ -1,4 +1,5 @@
 import init.bcm2166x.usb.rc
+import fstab.bcm2166x.rc
 import init.log.rc
 
 on early-init
@@ -437,7 +438,6 @@ on boot
     chown system system /efs/FactoryApp/serial_no
     
 on fs
-    mount_all /fstab.hawaii_ss_loganxx
     setprop ro.crypto.fuse_sdcard true
 
     # don't require sim

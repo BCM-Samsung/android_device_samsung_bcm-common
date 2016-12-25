@@ -7,7 +7,7 @@ PRODUCT_AAPT_CONFIG      := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
 # Common overlay
-DEVICE_PACKAGE_OVERLAYS += device/samsung/bcm-common/overlay
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
 # System properties
 -include device/samsung/bcm-common/system_prop.mk
