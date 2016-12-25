@@ -42,4 +42,5 @@
              android:storageDescription="@string/storage_sd_card"
              android:primary="false"
              android:removable="true"
+             android:allowMassStorage="true" />
 </StorageList>
