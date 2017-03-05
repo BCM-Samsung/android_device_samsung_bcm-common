@@ -15,11 +15,15 @@ TARGET_CPU_VARIANT            := cortex-a9
 TARGET_CPU_SMP                := true
 ARCH_ARM_HAVE_TLS_REGISTER    := true
 TARGET_BOOTLOADER_BOARD_NAME  := hawaii
+TARGET_GLOBAL_CFLAGS          += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
+TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
+
 
 # Kernel
-BOARD_KERNEL_BASE             := 0x82000000
-BOARD_KERNEL_PAGESIZE         := 4096
-TARGET_KERNEL_SOURCE          := kernel/samsung/bcm
+BOARD_KERNEL_BASE               := 0x82000000
+BOARD_KERNEL_PAGESIZE           := 4096
+TARGET_KERNEL_SOURCE            := kernel/samsung/bcm
+TARGET_KERNEL_CUSTOM_TOOLCHAIN  := arm-eabi-4.6
 
 # PARTITION SIZE
 BOARD_BOOTIMAGE_PARTITION_SIZE        := 8388608
@@ -68,7 +72,10 @@ BOARD_USE_MHEAP_SCREENSHOT        := true
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 TARGET_USES_ION                   := true
 HWUI_COMPILE_FOR_PERF             := true
-COMMON_GLOBAL_CFLAGS              += -DNEEDS_VECTORIMPL_SYMBOLS -DHAWAII_HWC
+COMMON_GLOBAL_CFLAGS              += -DNEEDS_VECTORIMPL_SYMBOLS -DHAWAII_HWC -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
+
+# Include an expanded selection of fonts
+EXTENDED_FONT_FOOTPRINT           := true
 
 # Opengl
 BOARD_USE_BGRA_8888               := true
@@ -89,7 +96,11 @@ TARGET_BOOTANIMATION_PRELOAD           := true
 TARGET_BOOTANIMATION_TEXTURE_CACHE     := true
 
 # Charger
+BOARD_BATTERY_DEVICE_NAME              := battery
+BOARD_CHARGER_ENABLE_SUSPEND           := true
 BOARD_CHARGING_MODE_BOOTING_LPM        := /sys/class/power_supply/battery/batt_lp_charging
+CHARGING_ENABLED_PATH                  := "/sys/class/power_supply/battery/batt_lp_charging"
+BACKLIGHT_PATH                         := "/sys/class/backlight/panel/brightness"
 
 # healthd
 BOARD_HAL_STATIC_LIBRARIES             := libhealthd-loganxx.hawaii
@@ -117,6 +128,12 @@ BOARD_HARDWARE_CLASS                   := hardware/samsung/cmhw/ device/samsung/
 # GPS
 TARGET_SPECIFIC_HEADER_PATH            := $(LOCAL_PATH)/include
 
+# Compat
+TARGET_USES_LOGD                       := false
+
+# jemalloc causes a lot of random crash on free()
+MALLOC_IMPL                            := dlmalloc
+
 # Misc.
 TARGET_SYSTEM_PROP                     := $(LOCAL_PATH)/system.prop
 
@@ -125,4 +142,21 @@ BOARD_SEPOLICY_DIRS += \
     device/samsung/bcm-common/sepolicy
 
 BOARD_SEPOLICY_UNION += \
-    file_contexts
+    file_contexts \
+    property_contexts \
+    service_contexts \
+    bkmgrd.te \
+    device.te \
+    surfaceflinger.te \
+    bluetooth.te \
+    geomagneticd.te \
+    gpsd.te \
+    init.te \
+    immvibed.te \
+    kernel.te \
+    macloader.te \
+    rild.te \
+    shell.te \
+    system_server.te \
+    tvserver.te \
+    vclmk.te
