@@ -23,7 +23,7 @@ TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
 BOARD_KERNEL_BASE               := 0x82000000
 BOARD_KERNEL_PAGESIZE           := 4096
 TARGET_KERNEL_SOURCE            := kernel/samsung/bcm
-TARGET_KERNEL_CUSTOM_TOOLCHAIN  := arm-eabi-4.6
+TARGET_KERNEL_CUSTOM_TOOLCHAIN  := arm-eabi-4.7
 
 # PARTITION SIZE
 BOARD_BOOTIMAGE_PARTITION_SIZE        := 8388608
