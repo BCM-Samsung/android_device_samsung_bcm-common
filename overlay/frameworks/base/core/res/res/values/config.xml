@@ -28,7 +28,7 @@
     <bool name="config_unplugTurnsOnScreen">true</bool>
 
     <!-- Our amoled doesn't animate well. -->
-    <bool name="config_animateScreenLights">false</bool>
+    <bool name="config_animateScreenLights">true</bool>
 
     <!-- disable menu hard key on Crespo in non-pattern lockscreen -->
     <bool name="config_disableMenuKeyInLockScreen">true</bool>
@@ -177,6 +177,12 @@
     <integer-array name="config_safeModeDisabledVibePattern">
         <item>1</item>
     </integer-array>
+	
+	<!-- The RadioAccessFamilies supported by the device.
+         Empty is viewed as "all".  Only used on devices which
+         don't support RIL_REQUEST_GET_RADIO_CAPABILITY
+         format is UMTS|LTE|... -->
+    <string translatable="false" name="config_radio_access_family">GSM|WCDMA</string>
 
     <!-- crespo doesn't handle this blur effect very quickly. -->
     <bool name="config_sf_slowBlur">true</bool>
@@ -245,7 +251,7 @@
     <bool name="config_batterySdCardAccessibility">true</bool>
 
     <!-- Support Miracast -->
-    <bool name="config_enableWifiDisplay">true</bool>
+    <bool name="config_enableWifiDisplay">false</bool>
 	    
     <integer name="config_screenBrightnessDoze">10</integer>
 
@@ -255,10 +261,24 @@
          turned off and the screen off animation has been performed. -->
     <bool name="config_dozeAfterScreenOff">true</bool>
 	
-	<!-- Is the device LTE capable -->
-    <bool name="config_lte_capable">false</bool>
+	<!-- Flag specifying whether VoLTE TTY is supported -->
+    <bool name="config_carrier_volte_tty_supported">false</bool>
+  
+    <!-- Boolean indicating whether the wifi chipset supports background scanning mechanism.
+          This mechanism allows the host to remain in suspend state and the dongle to actively
+          scan and wake the host when a configured SSID is detected by the dongle. This chipset
+          capability can provide power savings when wifi needs to be always kept on. -->
+    <bool translatable="false" name="config_wifi_background_scan_support">false</bool>
 	
-	<!-- CyanogenMod Performance profiles -->
-    <string name="config_perf_profile_prop">sys.perf.profile</string>
-    <string name="config_perf_profile_default_entry">1</string>
+    <!-- Ultrasound support for Mic/speaker path -->
+    <!-- Whether the default microphone audio source supports near-ultrasound frequencies
+         (range of 18 - 21 kHz). -->
+    <bool name="config_supportMicNearUltrasound">false</bool>
+    <!-- Whether the default speaker audio output path supports near-ultrasound frequencies
+         (range of 18 - 21 kHz). -->
+    <bool name="config_supportSpeakerNearUltrasound">false</bool>
+
+    <!-- Boolean indicating autojoin will prefer 5GHz and choose 5GHz BSSIDs -->
+    <bool translatable="true" name="config_wifi_enable_5GHz_preference">false</bool>
+
 </resources>

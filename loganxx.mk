@@ -59,7 +59,8 @@ PRODUCT_COPY_FILES += \
 
 # Charger
 PRODUCT_PACKAGES += \
-    charger_res_images
+    charger_res_images \
+    cm_charger_res_images
 
 # Filesystem management tools
 PRODUCT_PACKAGES += \
@@ -88,6 +89,15 @@ PRODUCT_PACKAGES += \
 # Samsung Doze
 PRODUCT_PACKAGES += \
     SamsungDoze
+
+# Gello
+PRODUCT_PACKAGES += \
+    Gello
+
+# GPS/RIL
+PRODUCT_PACKAGES += \
+    libstlport \
+    libglgps-compat
 
 # KSM
 PRODUCT_PROPERTY_OVERRIDES += \
