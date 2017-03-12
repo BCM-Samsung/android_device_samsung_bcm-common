@@ -1,7 +1,7 @@
-diff -ur CM13.0_loganxx/build/core/tasks/kernel.mk CM13.0_loganxx_patched/build/core/tasks/kernel.mk
---- CM13.0_loganxx/build/core/tasks/kernel.mk	2016-02-25 18:15:20.000000000 +0000
-+++ CM13.0_loganxx_patched/build/core/tasks/kernel.mk	2016-02-25 18:31:51.000000000 +0000
-@@ -208,7 +208,11 @@
+diff -ur a/build/core/tasks/kernel.mk b/build/core/tasks/kernel.mk
+--- a/build/core/tasks/kernel.mk	2016-02-25 18:15:20.000000000 +0000
++++ b/build/core/tasks/kernel.mk	2016-02-25 18:31:51.000000000 +0000
+@@ -227,7 +227,11 @@
      ccache := $(strip $(wildcard $(ccache)))
  endif
  
@@ -9,14 +9,15 @@ diff -ur CM13.0_loganxx/build/core/tasks/kernel.mk CM13.0_loganxx_patched/build/
 +ifneq ($(TARGET_KERNEL_CUSTOM_TOOLCHAIN),)     
 +    KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/arm-eabi-"      
 +else
-+	KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(KERNEL_TOOLCHAIN_PATH)"
++    KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(KERNEL_TOOLCHAIN_PATH)"
 +endif
  ccache =
  
  define mv-modules
-diff -ur CM13.0_loganxx/external/icu/icu4c/source/common/ucnv.c CM13.0_loganxx_patched/external/icu/icu4c/source/common/ucnv.c
---- CM13.0_loganxx/external/icu/icu4c/source/common/ucnv.c	2016-02-25 18:16:25.000000000 +0000
-+++ CM13.0_loganxx_patched/external/icu/icu4c/source/common/ucnv.c	2016-02-25 18:32:33.000000000 +0000
+
+diff -ur a/external/icu/icu4c/source/common/ucnv.c b/external/icu/icu4c/source/common/ucnv.c
+--- a/external/icu/icu4c/source/common/ucnv.c	2016-02-25 18:16:25.000000000 +0000
++++ b/external/icu/icu4c/source/common/ucnv.c	2016-02-25 18:32:33.000000000 +0000
 @@ -2914,6 +2914,76 @@
              return FALSE;
      }
@@ -94,24 +95,25 @@ diff -ur CM13.0_loganxx/external/icu/icu4c/source/common/ucnv.c CM13.0_loganxx_p
  #endif
  
  /*
-diff -ur CM13.0_loganxx/external/sepolicy/domain.te CM13.0_loganxx_patched/external/sepolicy/domain.te
---- CM13.0_loganxx/external/sepolicy/domain.te	2016-02-25 18:17:03.000000000 +0000
-+++ CM13.0_loganxx_patched/external/sepolicy/domain.te	2016-02-25 18:33:31.000000000 +0000
-@@ -236,11 +236,11 @@
+diff -ur a/external/sepolicy/domain.te b/external/sepolicy/domain.te
+--- a/external/sepolicy/domain.te	2016-02-25 18:17:03.000000000 +0000
++++ b/external/sepolicy/domain.te	2016-02-25 18:33:31.000000000 +0000
+@@ -237,11 +237,11 @@
  # init starts in kernel domain and switches to init domain via setcon in
  # the init.rc, so the setenforce occurs while still in kernel. After
  # switching domains, there is never any need to setenforce again by init.
 -neverallow domain kernel:security setenforce;
 -neverallow { domain -kernel } kernel:security setcheckreqprot;
-+# neverallow domain kernel:security setenforce;
-+# neverallow { domain -kernel } kernel:security setcheckreqprot;
++#neverallow domain kernel:security setenforce;
++#neverallow { domain -kernel } kernel:security setcheckreqprot;
  
  # No booleans in AOSP policy, so no need to ever set them.
 -neverallow domain kernel:security setbool;
-+# neverallow domain kernel:security setbool;
++#neverallow domain kernel:security setbool;
  
  # Adjusting the AVC cache threshold.
  # Not presently allowed to anything in policy, but possibly something
+
 diff -ur CM13.0_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h CM13.0_loganxx_patched/frameworks/av/include/media/stagefright/ColorConverter.h
 --- CM13.0_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:17:20.000000000 +0000
 +++ CM13.0_loganxx_patched/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:34:05.000000000 +0000
