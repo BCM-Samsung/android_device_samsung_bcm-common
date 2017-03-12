@@ -114,9 +114,9 @@ diff -ur a/external/sepolicy/domain.te b/external/sepolicy/domain.te
  # Adjusting the AVC cache threshold.
  # Not presently allowed to anything in policy, but possibly something
 
-diff -ur CM13.0_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h CM13.0_loganxx_patched/frameworks/av/include/media/stagefright/ColorConverter.h
---- CM13.0_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:17:20.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:34:05.000000000 +0000
+diff -ur a/frameworks/av/include/media/stagefright/ColorConverter.h b/frameworks/av/include/media/stagefright/ColorConverter.h
+--- a/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:17:20.000000000 +0000
++++ b/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:34:05.000000000 +0000
 @@ -66,6 +66,9 @@
  
      status_t convertCbYCrY(
@@ -127,52 +127,49 @@ diff -ur CM13.0_loganxx/frameworks/av/include/media/stagefright/ColorConverter.h
  
      status_t convertYUV420Planar(
              const BitmapParams &src, const BitmapParams &dst);
-diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM13.0_loganxx_patched/frameworks/av/media/libstagefright/ACodec.cpp
---- CM13.0_loganxx/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-25 18:17:20.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-25 19:26:57.000000000 +0000
-@@ -784,11 +784,11 @@
+diff -ur a/frameworks/av/media/libstagefright/ACodec.cpp b/frameworks/av/media/libstagefright/ACodec.cpp
+--- a/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-25 18:17:20.000000000 +0000
++++ b/frameworks/av/media/libstagefright/ACodec.cpp	2016-02-25 19:26:57.000000000 +0000
+@@ -785,11 +785,7 @@
  
      status_t err;
      if (mNativeWindow != NULL && portIndex == kPortIndexOutput) {
 -        if (storingMetadataInDecodedBuffers()) {
 -            err = allocateOutputMetadataBuffers();
 -        } else {
-+        //if (storingMetadataInDecodedBuffers()) {
-+		//    err = allocateOutputMetadataBuffers();
-+        //} else {
-             err = allocateOutputBuffersFromNativeWindow();
+-            err = allocateOutputBuffersFromNativeWindow();
 -        }
-+        //}
++         err = allocateOutputBuffersFromNativeWindow();
      } else {
          OMX_PARAM_PORTDEFINITIONTYPE def;
          InitOMXParams(&def);
-@@ -924,6 +924,25 @@
+@@ -925,6 +921,25 @@
      setNativeWindowColorFormat(eNativeColorFormat);
  #endif
  
-+	ALOGE("ACodec:PATCH:setupNativeWindowSizeFormatAndUsage[%s] def.format.video.eColorFormat(%i)", mComponentName.c_str(), def.format.video.eColorFormat);
-+	OMX_COLOR_FORMATTYPE HalColorFormat;
-+	switch (def.format.video.eColorFormat) {
-+		case OMX_COLOR_FormatYCbYCr:{
-+			def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
-+			status_t clp = mOMX->setParameter(mNode, OMX_IndexParamPortDefinition, &def, sizeof(def));
-+			HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
-+			ALOGE("ACodec:PATCH:setupNativeWindowSizeFormatAndUsage[%s] def.format.video.eColorFormat NOW (%i)", mComponentName.c_str(), def.format.video.eColorFormat);
-+			if (clp != OK) {
-+				ALOGE("ACodec:PATCH:setupNativeWindowSizeFormatAndUsage[%s] setParameter(OMX_IndexParamPortDefinition) ERROR", mComponentName.c_str());
-+			}
-+		}	
-+		break;
-+		default:
-+			ALOGE("ACodec:PATCH:setupNativeWindowSizeFormatAndUsage[%s] def.format.video.eColorFormat Default (%i) (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12", mComponentName.c_str(), (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12);
-+			HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
-+		break;
-+	}
++    ALOGE("ACodec:setupNativeWindowSizeFormatAndUsage[%s] def.format.video.eColorFormat(%i)", mComponentName.c_str(), def.format.video.eColorFormat);
++    OMX_COLOR_FORMATTYPE HalColorFormat;
++    switch (def.format.video.eColorFormat) {
++        case OMX_COLOR_FormatYCbYCr:{
++            def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
++            status_t clp = mOMX->setParameter(mNode, OMX_IndexParamPortDefinition, &def, sizeof(def));
++            HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
++            ALOGE("ACodec:setupNativeWindowSizeFormatAndUsage[%s] def.format.video.eColorFormat NOW (%i)", mComponentName.c_str(), def.format.video.eColorFormat);
++            if (clp != OK) {
++               ALOGE("ACodec:setupNativeWindowSizeFormatAndUsage[%s] setParameter(OMX_IndexParamPortDefinition) ERROR", mComponentName.c_str());
++            }
++        }
++        break;
++        default:
++            ALOGE("ACodec:setupNativeWindowSizeFormatAndUsage[%s] def.format.video.eColorFormat Default (%i) (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12", mComponentName.c_str(), (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12);
++            HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
++        break;
++    }
 +
      ALOGV("gralloc usage: %#x(OMX) => %#x(ACodec)", omxUsage, usage);
-     err = setNativeWindowSizeFormatAndUsage(
-             nativeWindow,
-@@ -932,7 +951,7 @@
+     int32_t width = 0, height = 0;
+     int32_t isAdaptivePlayback = 0;
+@@ -947,7 +962,7 @@
  #ifdef USE_SAMSUNG_COLORFORMAT
              eNativeColorFormat,
  #else
@@ -181,7 +178,7 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM13.0_log
  #endif
              mRotationDegrees,
              usage);
-@@ -1739,13 +1758,13 @@
+@@ -1757,13 +1772,13 @@
              mInputMetadataType = kMetadataBufferTypeCameraSource;
          }
  
@@ -202,7 +199,7 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM13.0_log
      }
  
      int32_t prependSPSPPS = 0;
-@@ -2247,20 +2266,20 @@
+@@ -2271,20 +2286,20 @@
          err = setMinBufferSize(kPortIndexInput, 8192);  // XXX
      }
  
@@ -237,45 +234,44 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM13.0_log
  
      mBaseOutputFormat = outputFormat;
  
-@@ -3948,6 +3967,20 @@
+@@ -3973,6 +3988,19 @@
      image.mNumPlanes = 0;
  
      const OMX_COLOR_FORMATTYPE fmt = params.eColorFormat;
-+	
-+	ALOGE("ACodec:PATCH:describeDefaultColorFormat eColorFormat = %i", params.eColorFormat);
-+	
-+	switch(params.eColorFormat){
-+		case OMX_COLOR_FormatYCbYCr:{
-+			ALOGE("ACodec:PATCH:describeDefaultColorFormat eColorFormat = %i SET to %i", params.eColorFormat, (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12);
-+			params.eColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
-+		}
-+		break;
-+		default:
-+			ALOGE("ACodec:PATCH:describeDefaultColorFormat default eColorFormat = %i", params.eColorFormat);
-+		break;
-+	}
-+	
++
++    ALOGE("ACodec:describeDefaultColorFormat eColorFormat = %i", params.eColorFormat);
++    switch(params.eColorFormat){
++        case OMX_COLOR_FormatYCbYCr:{
++            ALOGE("ACodec:describeDefaultColorFormat eColorFormat = %i SET to %i", params.eColorFormat, (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12);
++            params.eColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
++        }
++        break;
++        default:
++            ALOGE("ACodec:describeDefaultColorFormat default eColorFormat = %i", params.eColorFormat);
++        break;
++    }
++
      image.mWidth = params.nFrameWidth;
      image.mHeight = params.nFrameHeight;
  
-@@ -4127,6 +4160,16 @@
+@@ -4152,6 +4180,16 @@
          return BAD_VALUE;
      }
  
-+	ALOGE("ACodec:PATCH:getPortFormat[%s] getParameter(OMX_IndexParamPortDefinition) def.format.video.eColorFormat = %i", mComponentName.c_str(), def.format.video.eColorFormat);
-+	if(def.format.video.eColorFormat == OMX_COLOR_FormatYCbYCr){
-+		ALOGE("ACodec:PATCH:getPortFormat[%s] getParameter(OMX_IndexParamPortDefinition) def.format.video.eColorFormat = %i SET %i", mComponentName.c_str(), def.format.video.eColorFormat, OMX_COLOR_FormatYUV420Planar);
-+	    def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
-+		status_t ert = mOMX->setParameter(mNode, OMX_IndexParamPortDefinition, &def, sizeof(def));
-+		if (ert != OK) {
-+			ALOGE("ACodec:PATCH:getPortFormat[%s] setParameter(OMX_IndexParamPortDefinition) ERROR", mComponentName.c_str());
-+		}
-+	}
-+	
++    ALOGE("ACodec:getPortFormat[%s] getParameter(OMX_IndexParamPortDefinition) def.format.video.eColorFormat = %i", mComponentName.c_str(), def.format.video.eColorFormat);
++    if(def.format.video.eColorFormat == OMX_COLOR_FormatYCbYCr){
++        ALOGE("ACodec:getPortFormat[%s] getParameter(OMX_IndexParamPortDefinition) def.format.video.eColorFormat = %i SET %i", mComponentName.c_str(), def.format.video.eColorFormat, OMX_COLOR_FormatYUV420Planar);
++        def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
++        status_t ert = mOMX->setParameter(mNode, OMX_IndexParamPortDefinition, &def, sizeof(def));
++        if (ert != OK) {
++            ALOGE("ACodec:getPortFormat[%s] setParameter(OMX_IndexParamPortDefinition) ERROR", mComponentName.c_str());
++        }
++    }
++
      switch (def.eDomain) {
          case OMX_PortDomainVideo:
          {
-@@ -6564,14 +6607,14 @@
+@@ -6599,14 +6637,14 @@
          }
      }
  
@@ -298,9 +294,10 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/ACodec.cpp CM13.0_log
  
      return OK;
  }
-diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp CM13.0_loganxx_patched/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp
---- CM13.0_loganxx/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-25 18:17:21.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-25 19:03:58.000000000 +0000
+
+diff -ur a/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp b/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp
+--- a/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-25 18:17:21.000000000 +0000
++++ b/frameworks/av/media/libstagefright/colorconversion/ColorConverter.cpp	2016-02-25 19:03:58.000000000 +0000
 @@ -44,6 +44,7 @@
      switch (mSrcFormat) {
          case OMX_COLOR_FormatYUV420Planar:
@@ -392,9 +389,9 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/colorconversion/Color
              signed v_g = -v * 208;
              signed v_r = v * 409;
  
-diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/MediaBufferGroup.cpp CM13.0_loganxx_patched/frameworks/av/media/libstagefright/MediaBufferGroup.cpp
---- CM13.0_loganxx/frameworks/av/media/libstagefright/MediaBufferGroup.cpp	2016-02-25 18:17:20.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/av/media/libstagefright/MediaBufferGroup.cpp	2016-02-17 20:27:58.000000000 +0000
+diff -ur a/frameworks/av/media/libstagefright/MediaBufferGroup.cpp b/frameworks/av/media/libstagefright/MediaBufferGroup.cpp
+--- a/frameworks/av/media/libstagefright/MediaBufferGroup.cpp	2016-02-25 18:17:20.000000000 +0000
++++ b/frameworks/av/media/libstagefright/MediaBufferGroup.cpp	2016-02-17 20:27:58.000000000 +0000
 @@ -55,6 +55,13 @@
      mLastBuffer = buffer;
  }
@@ -409,9 +406,9 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/MediaBufferGroup.cpp 
  status_t MediaBufferGroup::acquire_buffer(
          MediaBuffer **out, bool nonBlocking) {
      Mutex::Autolock autoLock(mLock);
-diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/MPEG4Writer.cpp CM13.0_loganxx_patched/frameworks/av/media/libstagefright/MPEG4Writer.cpp
---- CM13.0_loganxx/frameworks/av/media/libstagefright/MPEG4Writer.cpp	2016-02-25 18:17:20.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/av/media/libstagefright/MPEG4Writer.cpp	2016-02-25 19:05:17.000000000 +0000
+diff -ur a/frameworks/av/media/libstagefright/MPEG4Writer.cpp b/frameworks/av/media/libstagefright/MPEG4Writer.cpp
+--- a/frameworks/av/media/libstagefright/MPEG4Writer.cpp	2016-02-25 18:17:20.000000000 +0000
++++ b/frameworks/av/media/libstagefright/MPEG4Writer.cpp	2016-02-25 19:05:17.000000000 +0000
 @@ -2370,8 +2370,8 @@
  
          timestampUs -= previousPausedDurationUs;
@@ -480,63 +477,57 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/MPEG4Writer.cpp CM13.
      }
  
      mOwner->trackProgressStatus(mTrackId, -1, err);
-diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/OMXCodec.cpp CM13.0_loganxx_patched/frameworks/av/media/libstagefright/OMXCodec.cpp
---- CM13.0_loganxx/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-25 18:17:20.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-25 19:06:50.000000000 +0000
-@@ -1338,6 +1338,12 @@
+diff -ur a/frameworks/av/media/libstagefright/OMXCodec.cpp b/frameworks/av/media/libstagefright/OMXCodec.cpp
+--- a/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-25 18:17:20.000000000 +0000
++++ b/frameworks/av/media/libstagefright/OMXCodec.cpp	2016-02-25 19:06:50.000000000 +0000
+@@ -1297,6 +1297,12 @@
          CHECK_EQ((int)format.eCompressionFormat, (int)OMX_VIDEO_CodingUnused);
  
          int32_t colorFormat;
-+		
-+		if (!strncmp("OMX.brcm.video.h264.hw.decoder", mComponentName, 30)) {
-+			ALOGE("PATCH:OMXCodec:setVideoOutputFormat[%s] colorFormat BRCM set 19", mComponentName);	
-+			format.eColorFormat = OMX_COLOR_FormatYUV420Planar;
-+		}
-+		
++
++        if (!strncmp("OMX.brcm.video.h264.hw.decoder", mComponentName, 30)) {
++            ALOGE("OMXCodec:setVideoOutputFormat[%s] colorFormat BRCM set 19", mComponentName);	
++            format.eColorFormat = OMX_COLOR_FormatYUV420Planar;
++        }
++
          if (meta->findInt32(kKeyColorFormat, &colorFormat)
                  && colorFormat != OMX_COLOR_FormatUnused
                  && colorFormat != format.eColorFormat) {
-@@ -1350,6 +1356,10 @@
+@@ -1309,6 +1315,10 @@
                  if (format.eColorFormat == colorFormat) {
                      break;
                  }
-+				if((unsigned int)err == 0x80001005){
-+					ALOGE("PATCH:OMXCodec:setVideoOutputFormat[%s] getParameter(OMX_IndexParamVideoPortFormat) colorFormat(%i) != format.eColorFormat (%i) OMX_ErrorNoMore", mComponentName, colorFormat, format.eColorFormat);
-+					err = OMX_ErrorNoMore;
-+				}
++                if((unsigned int)err == 0x80001005){
++                    ALOGE("OMXCodec:setVideoOutputFormat[%s] getParameter(OMX_IndexParamVideoPortFormat) colorFormat(%i) != format.eColorFormat (%i) OMX_ErrorNoMore", mComponentName, colorFormat, format.eColorFormat);
++                    err = OMX_ErrorNoMore;
++                }
              }
              if (format.eColorFormat != colorFormat) {
                  CODEC_LOGE("Color format %d is not supported", colorFormat);
-@@ -1837,12 +1847,37 @@
-             usage |= GRALLOC_USAGE_PRIVATE_NONSECURE;
+@@ -1799,11 +1809,31 @@
  #endif
      }
-+	
-+	ALOGE("PATCH:OMXCodec:allocateOutputBuffersFromNativeWindow def.format.video.eColorFormat = %i", def.format.video.eColorFormat);
-+
-+	OMX_COLOR_FORMATTYPE HalColorFormat;
-+	status_t errss;
-+	
-+	switch (def.format.video.eColorFormat) {
-+		case OMX_COLOR_FormatYCbYCr:
-+			ALOGE("PATCH:OMXCodec:allocateOutputBuffersFromNativeWindow OMX_COLOR_FormatYCbYCr(%i) -> (%i)", OMX_COLOR_FormatYCbYCr, OMX_COLOR_FormatYUV420Planar);
-+			def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
-+			//errss = mOMX->setParameter(mNode, OMX_IndexParamPortDefinition, &def, sizeof(def));
-+			//if (errss != OK){
-+			//	ALOGE("PATCH:OMXCodec:allocateOutputBuffersFromNativeWindow setParameter failed: %d", errss);
-+			//}		
-+			HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
-+		break;
-+		case OMX_COLOR_FormatYUV420Planar:
-+			ALOGE("PATCH:OMXCodec:allocateOutputBuffersFromNativeWindow OMX_COLOR_FormatYUV420Planar(%i) -> HAL_PIXEL_FORMAT_YV12(%i)", OMX_COLOR_FormatYUV420Planar, (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12);
-+			HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
-+		break;
-+		default:
-+			ALOGE("PATCH:OMXCodec:allocateOutputBuffersFromNativeWindow default(%i) -> default(%i)", def.format.video.eColorFormat, def.format.video.eColorFormat);
-+			HalColorFormat = def.format.video.eColorFormat;
-+		break;
-+	}
  
++    ALOGE("OMXCodec:allocateOutputBuffersFromNativeWindow def.format.video.eColorFormat = %i", def.format.video.eColorFormat);
++    OMX_COLOR_FORMATTYPE HalColorFormat;
++    status_t errss;
++
++    switch (def.format.video.eColorFormat) {
++        case OMX_COLOR_FormatYCbYCr:
++            ALOGE("OMXCodec:allocateOutputBuffersFromNativeWindow OMX_COLOR_FormatYCbYCr(%i) -> (%i)", OMX_COLOR_FormatYCbYCr, OMX_COLOR_FormatYUV420Planar);
++            def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
++            HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
++        break;
++        case OMX_COLOR_FormatYUV420Planar:
++            ALOGE("OMXCodec:allocateOutputBuffersFromNativeWindow OMX_COLOR_FormatYUV420Planar(%i) -> HAL_PIXEL_FORMAT_YV12(%i)", OMX_COLOR_FormatYUV420Planar, (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12);
++            HalColorFormat = (OMX_COLOR_FORMATTYPE)HAL_PIXEL_FORMAT_YV12;
++        break;
++        default:
++            ALOGE("OMXCodec:allocateOutputBuffersFromNativeWindow default(%i) -> default(%i)", def.format.video.eColorFormat, def.format.video.eColorFormat);
++            HalColorFormat = def.format.video.eColorFormat;
++        break;
++    }
++
      err = setNativeWindowSizeFormatAndUsage(
              mNativeWindow.get(),
              def.format.video.nFrameWidth,
@@ -546,26 +537,27 @@ diff -ur CM13.0_loganxx/frameworks/av/media/libstagefright/OMXCodec.cpp CM13.0_l
              rotationDegrees,
              usage | GRALLOC_USAGE_HW_TEXTURE | GRALLOC_USAGE_EXTERNAL_DISP);
      if (err != 0) {
-@@ -4499,7 +4534,14 @@
-                     caps->mColorFormats.push(flexibleEquivalent);
+@@ -4454,7 +4484,14 @@
+                     }
+                 }
+                 if (!marked) {
+-                    caps->mColorFormats.push(flexibleEquivalent);
++                    //caps->mColorFormats.push(flexibleEquivalent);
++                    if(portFormat.eColorFormat == OMX_COLOR_FormatYCbYCr) {
++                        ALOGE("OMXCodec:QueryCodec:getParameter(IndexParamVideoPortFormat) portFormat.eColorFormat %i SET %i", portFormat.eColorFormat, OMX_COLOR_FormatYUV420Planar);
++                        caps->mColorFormats.push(OMX_COLOR_FormatYUV420Planar);
++                    }else{
++                        ALOGE("OMXCodec:QueryCodec:getParameter(IndexParamVideoPortFormat) DEFAULT portFormat.eColorFormat %i", portFormat.eColorFormat);
++                        caps->mColorFormats.push(portFormat.eColorFormat);
++                    }
                  }
              }
--            caps->mColorFormats.push(portFormat.eColorFormat);
-+            //caps->mColorFormats.push(portFormat.eColorFormat);
-+			if(portFormat.eColorFormat == OMX_COLOR_FormatYCbYCr) {
-+				ALOGE("PATCH:OMXCodec:QueryCodec:getParameter(IndexParamVideoPortFormat) portFormat.eColorFormat %i SET %i", portFormat.eColorFormat, OMX_COLOR_FormatYUV420Planar);
-+				caps->mColorFormats.push(OMX_COLOR_FormatYUV420Planar);
-+			}else{
-+				ALOGE("PATCH:OMXCodec:QueryCodec:getParameter(IndexParamVideoPortFormat) DEFAULT portFormat.eColorFormat %i", portFormat.eColorFormat);
-+				caps->mColorFormats.push(portFormat.eColorFormat);
-+			}
-         }
-     }
- 
-diff -ur CM13.0_loganxx/frameworks/base/telephony/java/android/telephony/TelephonyManager.java CM13.0_loganxx_patched/frameworks/base/telephony/java/android/telephony/TelephonyManager.java
---- CM13.0_loganxx/frameworks/base/telephony/java/android/telephony/TelephonyManager.java	2016-02-25 18:17:42.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/base/telephony/java/android/telephony/TelephonyManager.java	2016-02-25 19:07:39.000000000 +0000
-@@ -3301,49 +3301,20 @@
+             caps->mColorFormats.push(portFormat.eColorFormat);
+
+diff -ur a/frameworks/base/telephony/java/android/telephony/TelephonyManager.java b/frameworks/base/telephony/java/android/telephony/TelephonyManager.java
+--- a/frameworks/base/telephony/java/android/telephony/TelephonyManager.java	2016-02-25 18:17:42.000000000 +0000
++++ b/frameworks/base/telephony/java/android/telephony/TelephonyManager.java	2016-02-25 19:07:39.000000000 +0000
+@@ -3385,49 +3385,20 @@
       * @hide
       */
      public static void setTelephonyProperty(int phoneId, String property, String value) {
@@ -580,8 +572,7 @@ diff -ur CM13.0_loganxx/frameworks/base/telephony/java/android/telephony/Telepho
 -        if (prop != null) {
 -            p = prop.split(",");
 -        }
--
-+        
+ 
          if (!SubscriptionManager.isValidPhoneId(phoneId)) {
              Rlog.d(TAG, "setTelephonyProperty: invalid phoneId=" + phoneId +
 -                    " property=" + property + " value: " + value + " prop=" + prop);
@@ -621,7 +612,7 @@ diff -ur CM13.0_loganxx/frameworks/base/telephony/java/android/telephony/Telepho
      }
  
      /**
-@@ -3440,15 +3411,22 @@
+@@ -3524,15 +3495,22 @@
       * @hide
       */
      public static String getTelephonyProperty(int phoneId, String property, String defaultVal) {
@@ -639,7 +630,7 @@ diff -ur CM13.0_loganxx/frameworks/base/telephony/java/android/telephony/Telepho
          }
 -        return propVal == null ? defaultVal : propVal;
 +       
-+	    if (phoneId > 0) {
++        if (phoneId > 0) {
 +            property += "_" + phoneId;
 +        }
 +
@@ -652,10 +643,10 @@ diff -ur CM13.0_loganxx/frameworks/base/telephony/java/android/telephony/Telepho
      }
  
      /** @hide */
-diff -ur CM13.0_loganxx/frameworks/native/libs/binder/Parcel.cpp CM13.0_loganxx_patched/frameworks/native/libs/binder/Parcel.cpp
---- CM13.0_loganxx/frameworks/native/libs/binder/Parcel.cpp	2016-02-25 18:17:43.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/native/libs/binder/Parcel.cpp	2016-02-25 19:08:11.000000000 +0000
-@@ -859,6 +859,12 @@
+diff -ur a/frameworks/native/libs/binder/Parcel.cpp b/frameworks/native/libs/binder/Parcel.cpp
+--- a/frameworks/native/libs/binder/Parcel.cpp	2016-02-25 18:17:43.000000000 +0000
++++ b/frameworks/native/libs/binder/Parcel.cpp	2016-02-25 19:08:11.000000000 +0000
+@@ -895,6 +895,12 @@
      return writeString16(str.string(), str.size());
  }
  
@@ -668,59 +659,60 @@ diff -ur CM13.0_loganxx/frameworks/native/libs/binder/Parcel.cpp CM13.0_loganxx_
  status_t Parcel::writeString16(const char16_t* str, size_t len)
  {
      if (str == NULL) return writeInt32(-1);
-diff -ur CM13.0_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java CM13.0_loganxx_patched/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java
---- CM13.0_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-25 18:17:45.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-25 19:09:41.000000000 +0000
-@@ -232,6 +232,7 @@
+
+diff -ur a/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java b/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java
+--- a/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-25 18:17:45.000000000 +0000
++++ b/frameworks/opt/telephony/src/java/com/android/internal/telephony/PhoneBase.java	2016-02-25 19:09:41.000000000 +0000
+@@ -239,6 +239,7 @@
      boolean mDnsCheckDisabled;
      public DcTrackerBase mDcTracker;
      boolean mDoesRilSendMultipleCallRing;
-+	boolean mDoesRilSendCallRing;
++    boolean mDoesRilSendCallRing;
      int mCallRingContinueToken;
      int mCallRingDelay;
      public boolean mIsTheCurrentActivePhone = true;
-@@ -462,6 +463,11 @@
-         mDoesRilSendMultipleCallRing = SystemProperties.getBoolean(
+@@ -472,6 +473,11 @@
                  TelephonyProperties.PROPERTY_RIL_SENDS_MULTIPLE_CALL_RING, true);
          Rlog.d(LOG_TAG, "mDoesRilSendMultipleCallRing=" + mDoesRilSendMultipleCallRing);
-+		
-+		// Some RIL do not even send a single RIL_UNSOL_CALL_RING
+ 
++        // Some RIL do not even send a single RIL_UNSOL_CALL_RING
 +        mDoesRilSendCallRing = SystemProperties.getBoolean(
 +                "ro.telephony.call_ring", true);
 +        Rlog.d(LOG_TAG, "mDoesRilSendCallRing=" + mDoesRilSendCallRing);
- 
++
          mCallRingDelay = SystemProperties.getInt(
                  TelephonyProperties.PROPERTY_CALL_RING_DELAY, 3000);
-@@ -2172,6 +2178,18 @@
+         Rlog.d(LOG_TAG, "mCallRingDelay=" + mCallRingDelay);
+@@ -2256,6 +2262,17 @@
      public void notifyNewRingingConnectionP(Connection cn) {
          if (!mIsVoiceCapable)
              return;
-+		
-+		// Fake RIL_UNSOL_CALL_RING if the RIL doesn't send it.
++
++        // Fake RIL_UNSOL_CALL_RING if the RIL doesn't send it.
 +        // Note that we need the delay to prevent the request from
 +        // being sent after CallTracker detects "RINGING" state, but
 +        // before the correct contact-specific ringtone is queried.
 +        // Otherwise, the incorrect ringtone will be used
 +        if (!mDoesRilSendCallRing) {
-+            int token = ++mCallRingContinueToken;
++           int token = ++mCallRingContinueToken;
 +            sendMessageDelayed(
 +                    obtainMessage(EVENT_CALL_RING_CONTINUE, token, 0), mCallRingDelay);
 +        }
-+		
          AsyncResult ar = new AsyncResult(null, cn, null);
          mNewRingingConnectionRegistrants.notifyRegistrants(ar);
      }
-@@ -2767,6 +2785,7 @@
+@@ -2884,6 +2901,7 @@
          pw.println(" mDnsCheckDisabled=" + mDnsCheckDisabled);
          pw.println(" mDcTracker=" + mDcTracker);
          pw.println(" mDoesRilSendMultipleCallRing=" + mDoesRilSendMultipleCallRing);
-+		pw.println(" mDoesRilSendCallRing=" + mDoesRilSendCallRing);
++        pw.println(" mDoesRilSendCallRing=" + mDoesRilSendCallRing);
          pw.println(" mCallRingContinueToken=" + mCallRingContinueToken);
          pw.println(" mCallRingDelay=" + mCallRingDelay);
          pw.println(" mIsTheCurrentActivePhone=" + mIsTheCurrentActivePhone);
-diff -ur CM13.0_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java CM13.0_loganxx_patched/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java
---- CM13.0_loganxx/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java	2016-02-25 18:17:45.000000000 +0000
-+++ CM13.0_loganxx_patched/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java	2016-02-25 19:09:54.000000000 +0000
+
+diff -ur a/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java b/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java
+--- a/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java	2016-02-25 18:17:45.000000000 +0000
++++ b/frameworks/opt/telephony/src/java/com/android/internal/telephony/RIL.java	2016-02-25 19:09:54.000000000 +0000
 @@ -303,7 +303,7 @@
      static final int RESPONSE_SOLICITED = 0;
      static final int RESPONSE_UNSOLICITED = 1;
@@ -730,9 +722,9 @@ diff -ur CM13.0_loganxx/frameworks/opt/telephony/src/java/com/android/internal/t
  
      static final int SOCKET_OPEN_RETRY_MILLIS = 4 * 1000;
  
-diff -ur CM13.0_loganxx/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java CM13.0_loganxx_patched/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java
---- CM13.0_loganxx/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java	2016-02-25 18:18:04.000000000 +0000
-+++ CM13.0_loganxx_patched/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java	2016-02-25 19:10:47.000000000 +0000
+diff -ur a/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java b/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java
+--- a/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java	2016-02-25 18:18:04.000000000 +0000
++++ b/packages/inputmethods/LatinIME/java/src/com/android/inputmethod/latin/utils/JniUtils.java	2016-02-25 19:10:47.000000000 +0000
 @@ -26,14 +26,10 @@
      public static boolean mHaveGestureLib = false;
      static {
@@ -751,9 +743,9 @@ diff -ur CM13.0_loganxx/packages/inputmethods/LatinIME/java/src/com/android/inpu
          }
      }
  
-diff -ur CM13.0_loganxx/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java CM13.0_loganxx_patched/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java
---- CM13.0_loganxx/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java	2016-02-25 18:18:04.000000000 +0000
-+++ CM13.0_loganxx_patched/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java	2016-02-25 19:11:33.000000000 +0000
+diff -ur a/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java b/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java
+--- a/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java	2016-02-25 18:18:04.000000000 +0000
++++ b/packages/inputmethods/LatinIME/java-overridable/src/com/android/inputmethod/latin/define/JniLibName.java	2016-02-25 19:11:33.000000000 +0000
 @@ -22,5 +22,4 @@
      }
  
