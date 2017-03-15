@@ -14,10 +14,12 @@ TARGET_ARCH_VARIANT           := armv7-a-neon
 TARGET_CPU_VARIANT            := cortex-a9
 TARGET_CPU_SMP                := true
 ARCH_ARM_HAVE_TLS_REGISTER    := true
+ARCH_ARM_HAVE_ARMV7A          := true
+ARCH_ARM_HAVE_VFP             := true
+ARCH_ARM_HAVE_NEON            := true
 TARGET_BOOTLOADER_BOARD_NAME  := hawaii
-TARGET_GLOBAL_CFLAGS          += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
-TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
-
+TARGET_GLOBAL_CFLAGS          += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
+TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
 
 # Kernel
 BOARD_KERNEL_BASE               := 0x82000000
@@ -64,18 +66,20 @@ WIFI_BAND                                   := 802_11_ABG
 
 
 # Resolution
-TARGET_SCREEN_HEIGHT := 800
-TARGET_SCREEN_WIDTH  := 480
+TARGET_SCREEN_HEIGHT              := 800
+TARGET_SCREEN_WIDTH               := 480
 
 # Hardware rendering
-USE_OPENGL_RENDERER               := true
-BOARD_USE_MHEAP_SCREENSHOT        := true
-BOARD_EGL_WORKAROUND_BUG_10194508 := true
-TARGET_USES_ION                   := true
-HWUI_COMPILE_FOR_PERF             := true
-COMMON_GLOBAL_CFLAGS              += -DNEEDS_VECTORIMPL_SYMBOLS -DHAWAII_HWC -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
+USE_OPENGL_RENDERER                         := true
+BOARD_USE_MHEAP_SCREENSHOT                  := true
+BOARD_EGL_WORKAROUND_BUG_10194508           := true
+TARGET_USES_ION                             := true
+TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK       := true
+TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS       := true
+COMMON_GLOBAL_CFLAGS                        += -DNEEDS_VECTORIMPL_SYMBOLS -DHAWAII_HWC -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
 
 # Opengl
+BOARD_USES_HWCOMPOSER             := true
 BOARD_USE_BGRA_8888               := true
 
 # Audio

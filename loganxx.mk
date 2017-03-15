@@ -73,22 +73,29 @@ PRODUCT_PACKAGES += \
     audio.a2dp.default \
     audio.usb.default \
     audio.r_submix.default \
-    audio.primary.default
+    audio.primary.default \
+    libaudio-resampler
 
-# Device-specific packages
+# IPv6 tethering
 PRODUCT_PACKAGES += \
-    SamsungServiceMode
+    ebtables \
+    ethertypes
 
 # Wi-Fi
 PRODUCT_PACKAGES += \
     dhcpcd.conf \
     hostapd \
+	libnetcmdiface \
     wpa_supplicant \
     wpa_supplicant.conf
 
 # Samsung Doze
 PRODUCT_PACKAGES += \
     SamsungDoze
+
+# Snap Camera
+PRODUCT_PACKAGES += \
+    Snap
 
 # Gello
 PRODUCT_PACKAGES += \
@@ -128,14 +135,35 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Default=true for development builds, set by android buildsystem.
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.kernel.android.checkjni=0 \
+    ro.kernel.checkjni=0 \
     dalvik.vm.checkjni=false
+
+# Dex2Oat multi-thread
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sys.fw.dex2oat_thread_count=2
+    
+# UI & Performance tweaks
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.min.fling_velocity=8000 \
+    ro.min_pointer_dur=8 \
+    windowsmgr.max_events_per_sec=150 \
+    debug.performance.tuning=1
+
+# Low-RAM configs
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.sys.fw.bg_apps_limit=12 \
+    config.disable_atlas=true
+          
+# Use Awesomeplayer
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.sys.media.use-awesome=true	
 
 # MTP
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp
 
 # Dalvik heap config
-include frameworks/native/build/phone-hdpi-512-dalvik-heap.mk
+include frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk
 include frameworks/native/build/phone-xxhdpi-2048-hwui-memory.mk
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
