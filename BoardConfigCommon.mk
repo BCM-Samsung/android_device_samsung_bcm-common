@@ -22,8 +22,12 @@ TARGET_GLOBAL_CFLAGS          += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp 
 TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
 
 # Kernel
+BOARD_MKBOOTIMG_ARGS            := --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --tags_offset 0x00000100
 BOARD_KERNEL_BASE               := 0x82000000
 BOARD_KERNEL_PAGESIZE           := 4096
+BOARD_KERNEL_OFFSET             := 0x00008000
+BOARD_RAMDISK_OFFSET            := 0x01000000
+BOARD_KERNEL_TAGS_OFFSET        := 0x00000100
 TARGET_KERNEL_SOURCE            := kernel/samsung/bcm
 
 # Kernel toolchain
@@ -36,7 +40,10 @@ KERNEL_TOOLCHAIN_PREFIX         := arm-eabi-
 
 # PARTITION SIZE
 BOARD_BOOTIMAGE_PARTITION_SIZE        := 8388608
-BOARD_RECOVERYIMAGE_PARTITION_SIZE    := 8388608
+#BOARD_RECOVERYIMAGE_PARTITION_SIZE   := 8388608
+# //Fake Values to workaround build
+BOARD_RECOVERYIMAGE_PARTITION_SIZE    := 10279424
+# //
 BOARD_SYSTEMIMAGE_PARTITION_SIZE      := 1395654656
 BOARD_USERDATAIMAGE_PARTITION_SIZE    := 2189426688
 BOARD_CACHEIMAGE_PARTITION_SIZE       := 209715200
