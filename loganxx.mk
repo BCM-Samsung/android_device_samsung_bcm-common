@@ -36,7 +36,6 @@ PRODUCT_COPY_FILES += \
 # Init files
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ramdisk/fstab.hawaii_ss_loganxx:root/fstab.hawaii_ss_loganxx \
-    $(LOCAL_PATH)/ramdisk/init.rc:root/init.rc \
     $(LOCAL_PATH)/ramdisk/init.bcm2166x.usb.rc:root/init.bcm2166x.usb.rc \
     $(LOCAL_PATH)/ramdisk/init.log.rc:root/init.log.rc \
     $(LOCAL_PATH)/ramdisk/charger:root/charger
@@ -83,7 +82,6 @@ PRODUCT_PACKAGES += \
 
 # Wi-Fi
 PRODUCT_PACKAGES += \
-    dhcpcd.conf \
     hostapd \
 	libnetcmdiface \
     wpa_supplicant \
@@ -105,6 +103,19 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libstlport \
     libglgps-compat
+
+# Recorder
+PRODUCT_PACKAGES += \
+    Recorder
+
+# Widevine
+PRODUCT_PACKAGES += \
+    libshim_wvm
+
+# Media
+PRODUCT_PROPERTY_OVERRIDES += \
+    media.stagefright.legacyencoder=true \
+    media.stagefright.less-secure=true	
 
 # KSM
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -128,7 +139,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.telephony.call_ring.multiple=0 \
     ro.telephony.call_ring=0
 
-
 # Extended JNI checks
 # The extended JNI checks will cause the system to run more slowly, but they can spot a variety of nasty bugs 
 # before they have a chance to cause problems.
@@ -141,22 +151,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 # Dex2Oat multi-thread
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.sys.fw.dex2oat_thread_count=2
-    
-# UI & Performance tweaks
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.min.fling_velocity=8000 \
-    ro.min_pointer_dur=8 \
-    windowsmgr.max_events_per_sec=150 \
-    debug.performance.tuning=1
-
-# Low-RAM configs
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.sys.fw.bg_apps_limit=12 \
-    config.disable_atlas=true
-          
-# Use Awesomeplayer
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.sys.media.use-awesome=true	
 
 # MTP
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \

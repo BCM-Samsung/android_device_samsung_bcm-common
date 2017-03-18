@@ -25,11 +25,14 @@ TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp 
 BOARD_KERNEL_BASE               := 0x82000000
 BOARD_KERNEL_PAGESIZE           := 4096
 TARGET_KERNEL_SOURCE            := kernel/samsung/bcm
-TARGET_KERNEL_CUSTOM_TOOLCHAIN  := arm-eabi-4.7
+
+# Kernel toolchain
+KERNEL_TOOLCHAIN                := $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin
+KERNEL_TOOLCHAIN_PREFIX         := arm-eabi-
 
 # Extended filesystem support
-TARGET_KERNEL_HAVE_EXFAT        := true
-TARGET_KERNEL_HAVE_NTFS         := true
+#TARGET_KERNEL_HAVE_EXFAT        := true
+#TARGET_KERNEL_HAVE_NTFS         := true
 
 # PARTITION SIZE
 BOARD_BOOTIMAGE_PARTITION_SIZE        := 8388608
@@ -70,17 +73,15 @@ WIFI_BAND                                   := 802_11_ABG
 
 
 # Resolution
-TARGET_SCREEN_HEIGHT              := 800
-TARGET_SCREEN_WIDTH               := 480
+TARGET_SCREEN_HEIGHT                        := 800
+TARGET_SCREEN_WIDTH                         := 480
 
 # Hardware rendering
-USE_OPENGL_RENDERER                         := true
-BOARD_USE_MHEAP_SCREENSHOT                  := true
 BOARD_EGL_WORKAROUND_BUG_10194508           := true
 TARGET_USES_ION                             := true
 TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK       := true
 TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS       := true
-COMMON_GLOBAL_CFLAGS                        += -DNEEDS_VECTORIMPL_SYMBOLS -DHAWAII_HWC -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
+BOARD_GLOBAL_CFLAGS                         += -DNEEDS_VECTORIMPL_SYMBOLS -DHAWAII_HWC -DADD_LEGACY_ACQUIRE_BUFFER_SYMBOL
 
 # Opengl
 BOARD_USES_HWCOMPOSER             := true
@@ -107,11 +108,20 @@ BOARD_CHARGING_MODE_BOOTING_LPM        := /sys/class/power_supply/battery/batt_l
 BOARD_CHARGER_ENABLE_SUSPEND           := true
 
 # healthd
-BOARD_HAL_STATIC_LIBRARIES             := libhealthd-loganxx.hawaii
+BOARD_HAL_STATIC_LIBRARIES             := libhealthd.hawaii
 
 # RIL
 BOARD_RIL_CLASS                        := ../../../device/samsung/bcm-common/ril/
-COMMON_GLOBAL_CFLAGS                   += -DDISABLE_ASHMEM_TRACKING
+BOARD_GLOBAL_CFLAGS                    += -DDISABLE_ASHMEM_TRACKING
+
+# Camera
+TARGET_HAS_LEGACY_CAMERA_HAL1               := true
+
+# Some of our vendor libs have text relocations
+TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS      := true
+
+# Bionic (previously known as dlmalloc)
+MALLOC_SVELTE                               := true
 
 # Recovery
 #TARGET_RECOVERY_INITRC                := 
@@ -135,9 +145,6 @@ BOARD_HARDWARE_CLASS                   := hardware/samsung/cmhw/ device/samsung/
 
 # GPS
 TARGET_SPECIFIC_HEADER_PATH            := $(LOCAL_PATH)/include
-
-# jemalloc causes a lot of random crash on free()
-MALLOC_IMPL                            := dlmalloc
 
 # Misc.
 TARGET_SYSTEM_PROP                     := $(LOCAL_PATH)/system.prop
