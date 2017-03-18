@@ -71,7 +71,6 @@ WIFI_DRIVER_MODULE_ARG                      := "firmware_path=/system/etc/wifi/b
 WIFI_DRIVER_MODULE_AP_ARG                   := "firmware_path=/system/etc/wifi/bcmdhd_apsta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
 WIFI_BAND                                   := 802_11_ABG
 
-
 # Resolution
 TARGET_SCREEN_HEIGHT                        := 800
 TARGET_SCREEN_WIDTH                         := 480
