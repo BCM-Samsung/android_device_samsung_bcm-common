@@ -126,6 +126,11 @@ ADDITIONAL_DEFAULT_PROPERTIES += \
     ro.adb.secure=0 \
     persist.service.adb.enable=1
 
+# Misc
+PRODUCT_PACKAGES += \
+    busybox \
+    su
+
 # These are the hardware-specific settings that are stored in system properties.
 # Note that the only such settings should be the ones that are too low-level to
 # be reachable from resources or other mechanisms.
