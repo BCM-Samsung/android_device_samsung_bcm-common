@@ -1096,13 +1096,13 @@ diff -ur a/system/core/init/init.cpp b/system/core/init/init.cpp
 +
 +   /* if this was given on kernel command line, override what we read
 +    * before (e.g. from /proc/cpuinfo), if anything */
-+    tmp = property_get("ro.bootmode");
-+        strlcpy(hardware, tmp, sizeof(hardware));
++	std::string bootmodehw = property_get("ro.bootmode");
++        strlcpy(hardware, bootmodehw, sizeof(hardware));
 +    property_set("ro.hardware", hardware);
 +
-+    tmp = property_get("ro.boot.revision");
-+        snprintf(tmp, PROP_VALUE_MAX, "%d", revision);
-+    property_set("ro.revision", tmp);
++    std::string bootrevs = property_get("ro.boot.revision");
++        snprintf(bootrevs, PROP_VALUE_MAX, "%d", revision);
++    property_set("ro.revision", bootrevs);
  }
  
  static void process_kernel_dt() {
@@ -1145,6 +1145,18 @@ diff -ur a/system/core/init/util.cpp b/system/core/init/util.cpp
  void import_kernel_cmdline(bool in_qemu,
                             const std::function<void(const std::string&, const std::string&, bool)>& fn) {
      std::string cmdline;
+diff -ur a/system/core/init/util.h b/system/core/init/util.h
+--- a/system/core/init/util.h	2016-02-25 18:20:34.000000000 +0000
++++ b/system/core/init/util.h	2016-02-25 19:14:48.000000000 +0000
+@@ -59,6 +59,7 @@
+ void remove_link(const char *oldpath, const char *newpath);
+ int wait_for_file(const char *filename, int timeout);
+ void open_devnull_stdio(void);
++void get_hardware_name(char *hardware, unsigned int *revision);
+ void import_kernel_cmdline(bool in_qemu,
+                            const std::function<void(const std::string&, const std::string&, bool)>&);
+ int make_dir(const char *path, mode_t mode);
+
 diff -ur a/system/core/init/service.cpp b/system/core/init/service.cpp
 --- a/system/core/init/service.cpp	2017-01-02 17:12:14.000000000 +0000
 +++ b/system/core/init/service.cpp	2017-01-02 18:08:47.532000000 +0000
