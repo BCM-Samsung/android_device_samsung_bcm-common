@@ -34,9 +34,9 @@ TARGET_KERNEL_SOURCE            := kernel/samsung/bcm
 KERNEL_TOOLCHAIN                := $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin
 KERNEL_TOOLCHAIN_PREFIX         := arm-eabi-
 
-# Extended filesystem support
-#TARGET_KERNEL_HAVE_EXFAT        := true
-#TARGET_KERNEL_HAVE_NTFS         := true
+# Init BCM mod
+IGNORE_RO_BOOT_SERIALNO        := true
+IGNORE_RO_BOOT_REVISION        := true
 
 # PARTITION SIZE
 BOARD_BOOTIMAGE_PARTITION_SIZE        := 8388608
