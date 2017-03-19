@@ -1096,13 +1096,11 @@ diff -ur a/system/core/init/init.cpp b/system/core/init/init.cpp
 +
 +   /* if this was given on kernel command line, override what we read
 +    * before (e.g. from /proc/cpuinfo), if anything */
-+    ret = property_get("ro.boot.hardware", tmp);
-+    if (ret)
++    tmp = property_get("ro.bootmode");
 +        strlcpy(hardware, tmp, sizeof(hardware));
 +    property_set("ro.hardware", hardware);
 +
-+    ret = property_get("ro.boot.revision", tmp);
-+    if (!ret)
++    tmp = property_get("ro.boot.revision");
 +        snprintf(tmp, PROP_VALUE_MAX, "%d", revision);
 +    property_set("ro.revision", tmp);
  }
