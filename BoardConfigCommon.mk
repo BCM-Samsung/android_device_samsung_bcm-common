@@ -35,8 +35,8 @@ KERNEL_TOOLCHAIN                := $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/
 KERNEL_TOOLCHAIN_PREFIX         := arm-eabi-
 
 # Init BCM mod
-IGNORE_RO_BOOT_SERIALNO        := true
-IGNORE_RO_BOOT_REVISION        := true
+#IGNORE_RO_BOOT_SERIALNO        := true
+#IGNORE_RO_BOOT_REVISION        := true
 
 # PARTITION SIZE
 BOARD_BOOTIMAGE_PARTITION_SIZE        := 8388608
