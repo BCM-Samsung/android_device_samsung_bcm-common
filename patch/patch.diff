@@ -1063,13 +1063,13 @@ diff -ur a/system/core/init/init.cpp b/system/core/init/init.cpp
  static char qemu[32];
  static char battchg_pause[32];
  
-@@ -355,26 +358,37 @@
+@@ -355,26 +358,35 @@
  }
  
  static void export_kernel_boot_props() {
 +
-+    char tmp[PROP_VALUE_MAX];
-+    int ret;
++   char tmp[PROP_VALUE_MAX];
++   int ret;
 +
      struct {
          const char *src_prop;
@@ -1106,6 +1106,7 @@ diff -ur a/system/core/init/init.cpp b/system/core/init/init.cpp
  }
  
  static void process_kernel_dt() {
+
 diff -ur a/system/core/init/util.cpp b/system/core/init/util.cpp
 --- a/system/core/init/util.cpp	2017-01-02 17:12:13.996000000 +0000
 +++ b/system/core/init/util.cpp	2017-01-02 18:08:47.532000000 +0000
