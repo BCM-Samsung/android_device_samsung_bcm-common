@@ -35,7 +35,6 @@ PRODUCT_COPY_FILES += \
 
 # Init files
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/ramdisk/fstab.hawaii_ss_loganxx:root/fstab.hawaii_ss_loganxx \
     $(LOCAL_PATH)/ramdisk/init.bcm2166x.usb.rc:root/init.bcm2166x.usb.rc \
     $(LOCAL_PATH)/ramdisk/init.log.rc:root/init.log.rc \
     $(LOCAL_PATH)/ramdisk/charger:root/charger
