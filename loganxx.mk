@@ -105,11 +105,6 @@ PRODUCT_PACKAGES += \
     libstlport \
     libglgps-compat
 
-# Misc
-PRODUCT_PACKAGES += \
-    busybox \
-    su
-
 # KSM
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.ksm.default=0

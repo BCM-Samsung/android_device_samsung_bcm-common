@@ -20,6 +20,7 @@ ARCH_ARM_HAVE_NEON            := true
 TARGET_BOOTLOADER_BOARD_NAME  := hawaii
 TARGET_GLOBAL_CFLAGS          += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
 TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
+WITH_SU                       := true
 
 # Kernel
 BOARD_KERNEL_BASE               := 0x82000000

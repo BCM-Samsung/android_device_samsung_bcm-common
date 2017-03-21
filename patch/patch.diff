@@ -132,25 +132,6 @@ diff -ur a/external/icu/icu4c/source/common/ucnv.c b/external/icu/icu4c/source/c
  #endif
  
  /*
-diff -ur a/external/sepolicy/domain.te b/external/sepolicy/domain.te
---- a/external/sepolicy/domain.te	2016-02-25 18:17:03.000000000 +0000
-+++ b/external/sepolicy/domain.te	2016-02-25 18:33:31.000000000 +0000
-@@ -237,11 +237,11 @@
- # init starts in kernel domain and switches to init domain via setcon in
- # the init.rc, so the setenforce occurs while still in kernel. After
- # switching domains, there is never any need to setenforce again by init.
--neverallow domain kernel:security setenforce;
--neverallow { domain -kernel } kernel:security setcheckreqprot;
-+#neverallow domain kernel:security setenforce;
-+#neverallow { domain -kernel } kernel:security setcheckreqprot;
- 
- # No booleans in AOSP policy, so no need to ever set them.
--neverallow domain kernel:security setbool;
-+#neverallow domain kernel:security setbool;
- 
- # Adjusting the AVC cache threshold.
- # Not presently allowed to anything in policy, but possibly something
-
 diff -ur a/frameworks/av/include/media/stagefright/ColorConverter.h b/frameworks/av/include/media/stagefright/ColorConverter.h
 --- a/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:17:20.000000000 +0000
 +++ b/frameworks/av/include/media/stagefright/ColorConverter.h	2016-02-25 18:34:05.000000000 +0000
