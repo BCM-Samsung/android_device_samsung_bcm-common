@@ -880,6 +880,19 @@ diff -ur CM13.0_loganxx/system/core/include/utils/VectorImpl.h CM13.0_loganxx_pa
  
  private:
              ssize_t         _indexOrderOf(const void* item, size_t* order = 0) const;
+diff -ur a/system/core/init/init.cpp b/system/core/init/init.cpp
+--- a/system/core/init/init.cpp	2017-01-02 17:12:13.996000000 +0000
++++ b/system/core/init/init.cpp	2017-01-02 18:08:47.532000000 +0000
+@@ -893,7 +893,7 @@
+ enum selinux_enforcing_status { SELINUX_DISABLED, SELINUX_PERMISSIVE, SELINUX_ENFORCING };
+ 
+ static selinux_enforcing_status selinux_status_from_cmdline() {
+-    selinux_enforcing_status status = SELINUX_ENFORCING;
++    selinux_enforcing_status status = SELINUX_PERMISSIVE;
+ 
+     std::function<void(char*,bool)> fn = [&](char* name, bool in_qemu) {
+         char *value = strchr(name, '=');
+
 diff -ur CM13.0_loganxx/system/core/init/init.cpp CM13.0_loganxx_patched/system/core/init/init.cpp
 --- CM13.0_loganxx/system/core/init/init.cpp	2016-02-25 18:20:34.000000000 +0000
 +++ CM13.0_loganxx_patched/system/core/init/init.cpp	2016-02-25 19:14:27.000000000 +0000
