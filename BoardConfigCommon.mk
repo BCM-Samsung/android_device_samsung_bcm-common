@@ -20,14 +20,11 @@ ARCH_ARM_HAVE_NEON            := true
 TARGET_BOOTLOADER_BOARD_NAME  := hawaii
 TARGET_GLOBAL_CFLAGS          += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
 TARGET_GLOBAL_CPPFLAGS        += -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp -O3 -funsafe-math-optimizations
+WITH_SU                       := true
 
 # Kernel
-BOARD_MKBOOTIMG_ARGS            := --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --tags_offset 0x00000100
 BOARD_KERNEL_BASE               := 0x82000000
 BOARD_KERNEL_PAGESIZE           := 4096
-BOARD_KERNEL_OFFSET             := 0x00008000
-BOARD_RAMDISK_OFFSET            := 0x01000000
-BOARD_KERNEL_TAGS_OFFSET        := 0x00000100
 TARGET_KERNEL_SOURCE            := kernel/samsung/bcm
 
 # Kernel toolchain
@@ -124,7 +121,7 @@ BOARD_GLOBAL_CFLAGS                    += -DDISABLE_ASHMEM_TRACKING
 TARGET_HAS_LEGACY_CAMERA_HAL1               := true
 
 # Some of our vendor libs have text relocations
-TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS      := true
+#TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS      := true
 
 # Bionic (previously known as dlmalloc)
 MALLOC_SVELTE                               := true
