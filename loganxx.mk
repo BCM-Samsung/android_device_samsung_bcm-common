@@ -94,10 +94,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     Snap
 
-# Gello
-PRODUCT_PACKAGES += \
-    Gello
-
 # GPS/RIL
 PRODUCT_PACKAGES += \
     libstlport \
